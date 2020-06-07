@@ -7,6 +7,7 @@ const lobbies = require("../game/lobbies");
  *  TYPE: Type of message
  *      - CONNECT
  *      - DISCONNECT
+ *      - CREATE_LOBBY
  *      - MESSAGE
  *  DATA: Contents of the message
  */
@@ -21,9 +22,6 @@ function handle(socket, message) {
             break;
         case "CREATE_LOBBY":
             handleCreateLobby(socket, message.data);
-            break;
-        case "DESTROY_LOBBY":
-            handleDestroyLobby(socket, message.data);
             break;
         case "MESSAGE":
             handleMessage(socket, message.data);
@@ -48,7 +46,10 @@ function handleConnect(socket, data) {
 }
 
 function handleDisconnect(socket, data) {
-
+    let lobby = lobbies.getLobby(data.user.lobbyid);
+    if (lobby) {
+        lobby.disconnectClient(data.user.id);
+    }
 }
 
 function handleCreateLobby(socket, data) {
@@ -62,14 +63,10 @@ function handleCreateLobby(socket, data) {
     }));
 }
 
-function handleDestroyLobby(socket, data) {
-    
-}
-
 function handleMessage(socket, data) {
     let lobby = lobbies.getLobby(data.user.lobby);
     if (lobby) 
-        lobby.sendMessage(data.user.name, data.message, data.user.id);
+        lobby.sendMessage({ name: data.user.name, message: data.message, time: new Date() }, data.user.id);
 }
 
 function handleError(socket) {

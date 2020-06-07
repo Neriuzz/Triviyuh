@@ -1,3 +1,5 @@
+const lobbies = require("./lobbies");
+
 function generateId() {
     return (Math.floor(Math.random() * 10000) + 10000).toString().substring(1);
 }
@@ -16,17 +18,18 @@ class Lobby {
     disconnectClient(id) {
         delete clients[id].lobby;
         delete clients[id];
+        
+        // Delete the lobby if its empty
+        if (this.clients.length < 0)
+            lobbies.removeLobby(this.id);
+
     }
 
-    sendMessage(name, message, exclude) {
+    sendMessage(data, exclude) {
         // Stringify the message and get it ready to be sent
         const toSend = JSON.stringify({
             type: 'MESSAGE',
-            data: {
-                name,
-                message,
-                time: new Date()
-            }
+            data
         });
 
         // Broadcast the message to everyone in the lobby, except for the user who sent it

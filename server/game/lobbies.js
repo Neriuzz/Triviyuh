@@ -4,9 +4,9 @@ function addLobby(lobby) {
     lobbies[lobby.id] = lobby;
 }
 
-function removeLobby(lobby) {
-    if(lobbies[lobby.id])
-        delete lobbies[lobby.id];
+function removeLobby(id) {
+    if(lobbies[id])
+        delete lobbies[id];
 }
 
 function getLobby(id) {
