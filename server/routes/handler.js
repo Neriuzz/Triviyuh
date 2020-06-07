@@ -18,7 +18,7 @@
 	"type": "CREATE_LOBBY",
 	"data": {
 		"user": {
-			"name": "Nerius"
+			"name": "Littus"
 		}
 	}
 }
