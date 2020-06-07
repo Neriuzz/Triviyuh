@@ -18,8 +18,21 @@ class Lobby {
         delete clients[id];
     }
 
-    sendMessage(message, exclude) {
-        // TODO: Allow users in the same lobby to talk to eachother
+    sendMessage(name, message, exclude) {
+        // Stringify the message and get it ready to be sent
+        const toSend = JSON.stringify({
+            type: 'MESSAGE',
+            data: {
+                name,
+                message,
+                time: new Date()
+            }
+        });
+
+        // Broadcast the message to everyone in the lobby, except for the user who sent it
+        Object.keys(this.clients).filter(id => id !== exclude).forEach(id => {
+            this.clients[id].socket.send(toSend);
+        });
     }
 }
 

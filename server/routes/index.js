@@ -6,7 +6,11 @@ module.exports = function (fastify, opts, done) {
     });
     
     fastify.get("/ws", { websocket: true }, async (req, res) => {
-        req.socket.onmessage = (event) => handler.handle(req.socket, JSON.parse(event.data));
+        try {
+            req.socket.onmessage = (event) => handler.handle(req.socket, JSON.parse(event.data));
+        } catch (e) {
+            console.warn(e);
+        }
     });
 
     done();
