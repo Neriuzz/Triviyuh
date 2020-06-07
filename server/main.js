@@ -9,7 +9,7 @@ fastify.register(require("fastify-static"), {
     root: path.join(__dirname, "../static")
 });
 
-// Routes routes
+// Register routes
 fastify.register(require("./routes"));
 
 // Start the server

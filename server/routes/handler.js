@@ -67,9 +67,7 @@ function handleDestroyLobby(socket, data) {
 }
 
 function handleMessage(socket, data) {
-    let lobby = lobbies.getLobby(data.user.lobby);
-    if (lobby)
-        lobby.sendMessage(data.message, data.user.id);
+    
 }
 
 function handleError(socket) {
