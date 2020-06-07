@@ -1,4 +1,4 @@
-const handler = require("./handler");
+const {handle} = require("./handler");
 
 module.exports = function (fastify, opts, done) {
     fastify.get("/", async (req, res) => {
@@ -7,7 +7,7 @@ module.exports = function (fastify, opts, done) {
     
     fastify.get("/ws", { websocket: true }, async (req, res) => {
         try {
-            req.socket.onmessage = (event) => handler.handle(req.socket, JSON.parse(event.data));
+            req.socket.onmessage = (event) => handle(req.socket, JSON.parse(event.data));
         } catch (e) {
             console.warn(e);
         }
