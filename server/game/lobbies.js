@@ -1,3 +1,7 @@
+/**
+ * Keeps track of all current active lobbies
+ */
+
 let lobbies = {};
 
 function addLobby(lobby) {

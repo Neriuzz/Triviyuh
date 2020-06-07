@@ -1,16 +1,69 @@
+/**
+ * 
+ * SCHEMA
+{
+	"type": ...,
+	"data": {
+		"user": {
+			"name": ...,
+			"id": ...,
+			"lobby": ...
+		},
+		"message": "..."
+	}
+}
+
+1. CREATE
+{
+	"type": "CREATE_LOBBY",
+	"data": {
+		"user": {
+			"name": "Nerius"
+		}
+	}
+}
+
+2. CONNECT
+{
+	"type": "CONNECT",
+	"data": {
+		"user": {
+			"name": "Littus",
+			"lobby": "0779"
+		}
+	}
+}
+
+3. MESSAGE
+{
+	"type": "MESSAGE",
+	"data": {
+		"user": {
+			"name": "Littus",
+			"id": "5e1b9eae-2ccf-45f1-ae03-6b5acc41ced0",
+			"lobby": "0779"
+		},
+		"message": "Yo this game is awesome! 🔥👌"
+	}
+}
+
+4. DISCONNECT
+{
+	"type": "DISCONNECT",
+	"data": {
+		"user": {
+			"name": "Littus",
+			"id": "5e1b9eae-2ccf-45f1-ae03-6b5acc41ced0",
+			"lobby": "0779"
+		}
+	}
+}
+
+*/
+
 const Client = require("../game/client");
 const Lobby = require("../game/lobby");
 const lobbies = require("../game/lobbies");
-
-/**
- *  Message Structure
- *  TYPE: Type of message
- *      - CONNECT
- *      - DISCONNECT
- *      - CREATE_LOBBY
- *      - MESSAGE
- *  DATA: Contents of the message
- */
 
 function handle(socket, message) {
     switch (message.type) {
@@ -18,13 +71,13 @@ function handle(socket, message) {
             handleConnect(socket, message.data);
             break;
         case "DISCONNECT":
-            handleDisconnect(socket, message.data);
+            handleDisconnect(message.data);
             break;
         case "CREATE_LOBBY":
             handleCreateLobby(socket, message.data);
             break;
         case "MESSAGE":
-            handleMessage(socket, message.data);
+            handleMessage(message.data);
             break;
         default:
             console.warn(`Unsupported message type: ${message.type}`);
@@ -34,10 +87,14 @@ function handle(socket, message) {
 }
 
 function handleConnect(socket, data) {
-    let lobby = lobbies.getLobby(data.lobbyid);
+    let lobby = lobbies.getLobby(data.user.lobby);
     if (lobby) {
-        let client = new Client(socket, data.name);
+
+        // Create a new client and connect them
+        let client = new Client(socket, data.user.name);
         lobby.connectClient(client);
+
+        // DEBUG
         socket.send(JSON.stringify({
             type: 'INFO',
             data: `Successfully connected ${client.id} to lobby ${lobby.id}`
@@ -45,8 +102,8 @@ function handleConnect(socket, data) {
     }
 }
 
-function handleDisconnect(socket, data) {
-    let lobby = lobbies.getLobby(data.user.lobbyid);
+function handleDisconnect(data) {
+    let lobby = lobbies.getLobby(data.user.lobby);
     if (lobby) {
         lobby.disconnectClient(data.user.id);
     }
@@ -55,24 +112,29 @@ function handleDisconnect(socket, data) {
 function handleCreateLobby(socket, data) {
     let lobby = new Lobby();
     let client = new Client(socket, data.name);
+
     lobby.connectClient(client);
     lobbies.addLobby(lobby);
+
+    // DEBUG
     socket.send(JSON.stringify({
-        type: "INFO",
+        type: "DEBUG",
         data: `Successfully created lobby with id: ${lobby.id}`
     }));
 }
 
-function handleMessage(socket, data) {
+function handleMessage(data) {
     let lobby = lobbies.getLobby(data.user.lobby);
-    if (lobby) 
+    
+    // Check that the lobby exists, and the user is in that lobby.
+    if (lobby && lobby.findClient(data.user.id)) 
         lobby.sendMessage({ name: data.user.name, message: data.message, time: new Date() }, data.user.id);
 }
 
 function handleError(socket) {
     socket.send(JSON.stringify(
         {
-            type: "INFO",
+            type: "WARNING",
             data: "Server couldn't understand your message."
         }
     ));
