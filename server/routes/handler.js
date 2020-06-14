@@ -2,130 +2,93 @@
  * 
  * SCHEMA
 
-1. CREATE
+1. CONNECT
+{
+    "type": "CONNECT"
+}
+
+2. CREATE_LOBBY
 {
 	"type": "CREATE_LOBBY",
 	"data": {
-		"user": {
-			"name": "Littus"
-		}
+		"name": "Nerius"
 	}
 }
 
-2. CONNECT
+3. JOIN_LOBBY
 {
-	"type": "CONNECT",
-	"data": {
-		"user": {
-			"name": "Littus",
-			"lobby": "7869"
-		}
-	}
+    "type": "JOIN_LOBBY",
+    "data": {
+        "name": "Nerius",
+        "lobby": "1234"
+    }
 }
 
-3. MESSAGE (Client aware)
+4. MESSAGE (Client aware)
 {
 	"type": "MESSAGE",
     "data": {
         "message": "Yo this game is awesome! 🔥👌"
-        }
+    }
 }
 
-4. DISCONNECT (Client aware)
+5. DISCONNECT (Client aware)
 {
-    "type": "DISCONNECT",
-    "data": {}
+    "type": "DISCONNECT"
 }
 
 */
 
-const Client = require("../game/client");
 const Lobby = require("../game/lobby");
 const lobbies = require("../game/lobbies");
 
-function handle(socket, message) {
-    switch (message.type) {
-        case "CONNECT":
-            handleConnect(socket, message.data);
-            break;
-        case "CREATE_LOBBY":
-            handleCreateLobby(socket, message.data);
-            break;
-        case "DISCONNECT":
-            handleDisconnect(socket);
-            break;
-        case "MESSAGE":
-            handleMessage(socket, message.data);
-            break;
-        default:
-            console.warn(`Unsupported message type: ${message.type}`);
-            handleError(socket);
-            break;     
-    }
-}
+module.exports = {
+    "CREATE_LOBBY": (client, data) => {
+         // Set client name
+        client.setName(data.name);
 
-function handleConnect(socket, data) {
-    let lobby = lobbies.getLobby(data.user.lobby);
-    if (lobby) {
+        // Create lobby
+        let lobby = new Lobby();
 
-        // Create a new client and connect them
-        let client = new Client(socket, data.user.name);
+        // Add client to lobby, add lobby to lobby list
         lobby.connectClient(client);
-
-        // Make handler client aware
-        socket.client = client;
+        lobbies.addLobby(lobby);
 
         // DEBUG
-        socket.send(JSON.stringify({
-            type: 'INFO',
-            data: `Successfully connected ${client.id} to lobby ${lobby.id}`
+        client.socket.send(JSON.stringify({
+            type: "DEBUG",
+            data: `Successfully created lobby with id: ${lobby.id}`
         }));
-    }
-}
+    },
 
-function handleDisconnect(client) {
-    let lobby = lobbies.getLobby();
-    if (lobby) {
-        lobby.disconnectClient(data.user.id);
-    }
-}
+    "JOIN_LOBBY": (client, data) => {
+        let lobby = lobbies.getLobby(data.lobby);
+        if (lobby) {
+            // Set client name
+            client.setName(data.name);
+            // Connect client to lobby if lobby exists
+            lobby.connectClient(client);
 
-function handleCreateLobby(socket, data) {
-    // Create lobby and client
-    let lobby = new Lobby();
-    let client = new Client(socket, data.name);
-
-    // Add client to lobby, add lobby to lobby list
-    lobby.connectClient(client);
-    lobbies.addLobby(lobby);
-
-    // Make handler client aware
-    socket.client = client;
-
-    // DEBUG
-    socket.send(JSON.stringify({
-        type: "DEBUG",
-        data: `Successfully created lobby with id: ${lobby.id}`
-    }));
-}
-
-function handleMessage(socket, data) {
-    let lobby = lobbies.getLobby(socket.client.lobby);
-    
-    // Check that the lobby exists, and the user is in that lobby.
-    if (lobby && lobby.findClient(socket.client.id)) 
-        lobby.sendMessage({ name: socket.client.name, message: data.message, time: new Date() }, socket.client.id);
-}
-
-function handleError(socket) {
-    socket.send(JSON.stringify(
-        {
-            type: "WARNING",
-            data: "Server couldn't understand your message."
+            // DEBUG
+            client.socket.send(JSON.stringify({
+                type: 'DEBUG',
+                data: `Successfully connected ${client.id} to lobby ${lobby.id}`
+            }));
         }
-    ));
-}
+    },
 
-module.exports = {
-    handle
+    "MESSAGE": (client, data) => {
+        let lobby = lobbies.getLobby(client.lobby);
+
+        // Check that the lobby exists, and the user is in that lobby.
+        if (lobby && lobby.findClient(client.id)) 
+            lobby.sendMessage({ name: client.name, message: data.message, time: new Date() }, client.id);
+    },
+
+    "DISCONNECT": (client, data) => {
+        // Remove client from lobbies
+        let lobby = lobbies.getLobby();
+        if (lobby)
+            lobby.disconnectClient(client.id);
+    }
 }

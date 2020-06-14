@@ -1,4 +1,12 @@
-const {handle} = require("./handler");
+const handler = require("./handler");
+const Client = require("../game/client");
+
+function handle(client, event) {
+    let message = JSON.parse(event.data);
+
+    if (handler[message.type])
+        handler[message.type](client, message.data);
+}
 
 module.exports = function (fastify, opts, done) {
     fastify.get("/", async (req, res) => {
@@ -6,11 +14,12 @@ module.exports = function (fastify, opts, done) {
     });
     
     fastify.get("/ws", { websocket: true }, async (req, res) => {
-        try {
-            req.socket.onmessage = (event) => handle(req.socket, JSON.parse(event.data));
-        } catch (e) {
-            console.warn(e);
-        }
+        // Createt new client
+        let client = new Client(req.socket);
+
+        // Register handlers
+        client.socket.onmessage = (event) => handle(client, event); 
+        client.socket.onclose = (event) => handler.DISCONNECT(client);
     });
 
     done();
