@@ -2,12 +2,7 @@
  * 
  * SCHEMA
 
-1. CONNECT
-{
-    "type": "CONNECT"
-}
-
-2. CREATE_LOBBY
+1. CREATE_LOBBY
 {
 	"type": "CREATE_LOBBY",
 	"data": {
@@ -15,7 +10,7 @@
 	}
 }
 
-3. JOIN_LOBBY
+2. JOIN_LOBBY
 {
     "type": "JOIN_LOBBY",
     "data": {
@@ -24,7 +19,7 @@
     }
 }
 
-4. MESSAGE (Client aware)
+3. MESSAGE (Client aware)
 {
 	"type": "MESSAGE",
     "data": {
@@ -32,7 +27,7 @@
     }
 }
 
-5. DISCONNECT (Client aware)
+4. DISCONNECT (Client aware)
 {
     "type": "DISCONNECT"
 }
