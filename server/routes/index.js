@@ -14,7 +14,7 @@ module.exports = function (fastify, opts, done) {
     });
     
     fastify.get("/ws", { websocket: true }, async (req, res) => {
-        // Createt new client
+        // Create new client
         let client = new Client(req.socket);
 
         // Register handlers

@@ -1,7 +1,8 @@
-# 😂 Triviyuh 🔥👌
-## Triviyuh 😂🔥👌 is a multiplayer trivia game with a Vue frontend and NodeJS backend.
+# 🔥  Triviyuh  👌
 
-## GAME STILL IN DEVELOPMENT - 👀 this space 😂😂😂
+Triviyuh is a multiplayer trivia game with a Vue frontend and NodeJS backend.
 
 
-Created by Nerius Ilmonas with 🍀
+### GAME STILL IN DEVELOPMENT - 👀 this space
+
+Created by Nerius Ilmonas
