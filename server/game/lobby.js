@@ -17,11 +17,12 @@ class Lobby {
 
     connectClient(client) {
         this.clients[client.id] = client;
-        client.lobby = this.id;
+        client.addToLobby(this.id);
     }
 
     disconnectClient(id) {
-        delete clients[id].lobby;
+        // Remove client from lobby and lobbylist
+        clients[id].removeFromLobby(this.id);
         delete clients[id];
         
         // Delete the lobby if its empty

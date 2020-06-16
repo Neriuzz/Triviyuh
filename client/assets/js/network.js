@@ -1,17 +1,17 @@
+import handler from "./handler";
+
 var ws;
 
 // Connect and register message handler
-function connect() {
+export default function connect() {
     ws = new WebSocket("ws://localhost:3000/ws");
-    ws.onmessage = (event) => handleMessage(event);
+    ws.onmessage = (event) => handle(ws, event);
 };
 
-function handleMessage(message) {
-    let data = JSON.parse(message.data);
-    console.log(data);
-}
-
-export default {
-    connect
+function handle(socket, event) {
+    let message = JSON.parse(event.data);
+    
+    if (handler[message.type])
+        handler[message.type](socket, message.data);
 }
 

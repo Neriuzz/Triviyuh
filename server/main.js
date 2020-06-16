@@ -1,7 +1,6 @@
 // Modules
 const fastify = require("fastify")();
 const path = require("path");
-const game = require("./game/lobbies");
 
 // Register plugins
 fastify.register(require("fastify-websocket"));
@@ -12,8 +11,8 @@ fastify.register(require("fastify-static"), {
 // Register routes
 fastify.register(require("./routes"));
 
-// Start the server
-const start = async () => {
+// Start the server via IIFE
+(async () => {
     try {
         await fastify.listen(3000);
         console.log(`Server listening on ${fastify.server.address().port}`);
@@ -21,8 +20,7 @@ const start = async () => {
         fastify.log.error(err);
         process.exit(1);
     }
-}
-start();
+})();
 
 
 // Handle errors

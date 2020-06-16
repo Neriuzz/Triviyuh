@@ -39,6 +39,14 @@ const lobbies = require("../game/lobbies");
 
 module.exports = {
     "CREATE_LOBBY": (client, data) => {
+        // Check if user is already in a lobby
+        if (client.lobby) {
+            client.socket.send(JSON.stringify({
+                type: "ERROR",
+                data: "Please leave your current lobby first"
+            }));
+        }
+
          // Set client name
         client.setName(data.name);
 
@@ -57,6 +65,15 @@ module.exports = {
     },
 
     "JOIN_LOBBY": (client, data) => {
+        // Check if user is already in a lobby
+        if (client.lobby) {
+            client.socket.send(JSON.stringify({
+                type: "ERROR",
+                data: "Please leave your current lobby first"
+            }));
+            return;
+        }
+
         let lobby = lobbies.getLobby(data.lobby);
         if (lobby) {
             // Set client name
