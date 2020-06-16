@@ -8,20 +8,20 @@ function handle(client, event) {
         handler[message.type](client, message.data);
 }
 
-module.exports = function (fastify, opts, done) {
-    fastify.get("/", async (req, res) => {
+// Export single route that handles HTTP and WS requests
+module.exports = {
+    method: "GET",
+    url: "/",
+    handler: (req, res) => {
         res.sendFile("pages/index.html");
-    });
-    
-    fastify.get("/ws", { websocket: true }, async (req, res) => {
+    },
+    wsHandler: (conn, req) => {
         // Create new client
-        let client = new Client(req.socket);
+        let client = new Client(conn.socket);
 
         // Register handlers
-        client.socket.onmessage = (event) => handle(client, event); 
+        client.socket.onmessage = (event) => handle(client, event);
         client.socket.onclose = (event) => handler.DISCONNECT(client);
-    });
-
-    done();
+    }
 }
 

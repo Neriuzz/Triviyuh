@@ -9,7 +9,7 @@ fastify.register(require("fastify-static"), {
 });
 
 // Register routes
-fastify.register(require("./routes"));
+fastify.route(require("./routes"));
 
 // Start the server via IIFE
 (async () => {
