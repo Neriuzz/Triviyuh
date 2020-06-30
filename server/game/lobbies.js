@@ -9,7 +9,7 @@ function addLobby(lobby) {
 }
 
 function removeLobby(id) {
-    if(lobbies[id])
+    if (lobbies[id])
         delete lobbies[id];
 }
 
@@ -21,4 +21,4 @@ module.exports = {
     addLobby,
     removeLobby,
     getLobby,
-}
+};

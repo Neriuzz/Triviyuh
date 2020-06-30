@@ -8,4 +8,4 @@ export default {
     "ERROR": (socket, data) => {
 
     }
-}
+};

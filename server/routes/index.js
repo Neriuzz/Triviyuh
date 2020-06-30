@@ -23,5 +23,5 @@ module.exports = {
         client.socket.onmessage = (event) => handle(client, event);
         client.socket.onclose = (event) => handler.DISCONNECT(client);
     }
-}
+};
 

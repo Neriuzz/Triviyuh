@@ -22,15 +22,15 @@ class Lobby {
 
     disconnectClient(id) {
         // Remove client from lobby and lobbylist
-        clients[id].removeFromLobby(this.id);
-        delete clients[id];
-        
+        this.clients[id].removeFromLobby(this.id);
+        delete this.clients[id];
+
         // Delete the lobby if its empty
         if (this.clients.length < 0)
             lobbies.removeLobby(this.id);
 
     }
-    
+
     findClient(id) {
         return this.clients[id];
     }
@@ -38,7 +38,7 @@ class Lobby {
     sendMessage(data, exclude) {
         // Stringify the message and get it ready to be sent
         const toSend = JSON.stringify({
-            type: 'MESSAGE',
+            type: "MESSAGE",
             data
         });
 
